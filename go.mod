@@ -40,7 +40,7 @@ require (
 	github.com/go-openapi/swag v0.19.14
 	github.com/go-openapi/validate v0.20.1
 	github.com/gogo/protobuf v1.3.2
-	github.com/golang/protobuf v1.4.3
+	github.com/golang/protobuf v1.5.2
 	github.com/google/go-cmp v0.5.5
 	github.com/google/gopacket v1.1.19
 	github.com/google/gops v0.3.18
@@ -71,13 +71,15 @@ require (
 	github.com/servak/go-fastping v0.0.0-20160802140958-5718d12e20a0
 	github.com/shirou/gopsutil/v3 v3.21.2
 	github.com/sirupsen/logrus v1.7.0
-	github.com/spf13/cobra v1.1.1
+	github.com/spf13/cobra v1.1.3
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
 	github.com/vishvananda/netlink v1.1.1-0.20210510164352-d17758a128bf
 	github.com/vishvananda/netns v0.0.0-20201230012202-c4f3ca719c73
-	go.etcd.io/etcd v0.5.0-alpha.5.0.20201125193152-8a03d2e9614b
+	go.etcd.io/etcd/api/v3 v3.5.0-beta.3
+	go.etcd.io/etcd/client/pkg/v3 v3.5.0-beta.3
+	go.etcd.io/etcd/client/v3 v3.5.0-beta.3
 	go.uber.org/goleak v1.1.10
 	go.universe.tf/metallb v0.9.6
 	golang.org/x/crypto v0.0.0-20210503195802-e9a32991a82e
@@ -88,8 +90,8 @@ require (
 	golang.org/x/tools v0.1.0
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20210506160403-92e472f520a5
 	google.golang.org/genproto v0.0.0-20210126160654-44e461bb6506
-	google.golang.org/grpc v1.29.1
-	google.golang.org/protobuf v1.25.0
+	google.golang.org/grpc v1.38.0
+	google.golang.org/protobuf v1.26.0
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c
 	gopkg.in/ini.v1 v1.62.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
