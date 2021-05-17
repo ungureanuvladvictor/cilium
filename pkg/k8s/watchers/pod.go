@@ -231,10 +231,6 @@ func (k *K8sWatcher) addK8sPodV1(pod *slim_corev1.Pod) error {
 	if len(podIPs) > 0 {
 		err = k.updatePodHostData(nil, pod, nil, podIPs)
 
-		// There might be duplicate callbacks here since this function is also
-		// called from updateK8sPodV1, the consumer will need to handle the duplicate
-		// events accordingly.
-		// GH issue #13136.
 		if option.Config.EnableLocalRedirectPolicy {
 			k.redirectPolicyManager.OnAddPod(pod)
 		}
@@ -253,6 +249,17 @@ func (k *K8sWatcher) updateK8sPodV1(oldK8sPod, newK8sPod *slim_corev1.Pod) error
 		return nil
 	}
 
+	logger := log.WithFields(logrus.Fields{
+		logfields.K8sPodName:   newK8sPod.ObjectMeta.Name,
+		logfields.K8sNamespace: newK8sPod.ObjectMeta.Namespace,
+		"new-podIP":            newK8sPod.Status.PodIP,
+		"new-podIPs":           newK8sPod.Status.PodIPs,
+		"new-hostIP":           newK8sPod.Status.PodIP,
+		"old-podIP":            oldK8sPod.Status.PodIP,
+		"old-podIPs":           oldK8sPod.Status.PodIPs,
+		"old-hostIP":           oldK8sPod.Status.PodIP,
+	})
+
 	// In Kubernetes Jobs, Pods can be left in Kubernetes until the Job
 	// is deleted. If the Job is never deleted, Cilium will never receive a Pod
 	// delete event, causing the IP to be left in the ipcache.
@@ -263,10 +270,19 @@ func (k *K8sWatcher) updateK8sPodV1(oldK8sPod, newK8sPod *slim_corev1.Pod) error
 		return k.deleteK8sPodV1(newK8sPod)
 	}
 
-	// The pod IP can never change, it can only switch from unassigned to
-	// assigned
-	// Process IP updates
-	k.addK8sPodV1(newK8sPod)
+	if newK8sPod.Spec.HostNetwork {
+		logger.Debug("Pod is using host networking")
+		return nil
+	}
+
+	oldPodIPs := k8sUtils.ValidIPs(oldK8sPod.Status)
+	newPodIPs := k8sUtils.ValidIPs(newK8sPod.Status)
+	err := k.updatePodHostData(oldK8sPod, newK8sPod, oldPodIPs, newPodIPs)
+
+	if err != nil {
+		logger.WithError(err).Warning("Unable to update ipcache map entry on pod add")
+		return err
+	}
 
 	// Check annotation updates.
 	oldAnno := oldK8sPod.ObjectMeta.Annotations
@@ -584,6 +600,12 @@ func (k *K8sWatcher) upsertHostPortMapping(oldPod, newPod *slim_corev1.Pod, oldP
 	if !option.Config.EnableHostPort {
 		return nil
 	}
+
+	// no-op if specs are the same
+	if oldPod != nil && newPod.Spec.DeepEqual(&oldPod.Spec) {
+		return nil
+	}
+
 	var svcsAdded []loadbalancer.L3n4Addr
 
 	logger := log.WithFields(logrus.Fields{
