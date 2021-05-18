@@ -123,6 +123,9 @@ var (
 		"nativeRoutingCIDR":      NativeRoutingCIDR,
 
 		"ipam.operator.clusterPoolIPv6PodCIDR": "fd02::/112",
+
+		// To enable SA for both KPR disabled and !strict
+		"sessionAffinity": "true",
 	}
 
 	eksChainingHelmOverrides = map[string]string{
@@ -2379,7 +2382,6 @@ func (kub *Kubectl) overwriteHelmOptions(options map[string]string) error {
 	if DoesNotRunOn419OrLaterKernel() {
 		addIfNotOverwritten(options, "kubeProxyReplacement", "disabled")
 		addIfNotOverwritten(options, "bpf.masquerade", "false")
-		addIfNotOverwritten(options, "sessionAffinity", "false")
 	}
 	if DoesNotRunOnNetNextKernel() {
 		addIfNotOverwritten(options, "bandwidthManager", "false")
