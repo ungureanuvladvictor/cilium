@@ -439,9 +439,9 @@ Users (Alphabetically)
       U: Networking, network policy, hubble, observability
 
     * N: Palantir Technologies Inc.
-      D: Palantir is using Cilium as their main CNI plugin in all major cloud providers [AWS/Azure/GCP] (self hosted k8s).
-      U: ENI networking, L3/L4 policies, FQDN based policy, FQDN filtering, IPSec
-      Q: ungureanuvladvictor
+      D: Palantir is using Cilium as their main CNI plugin in all major cloud providers [AWS/Azure/GCP] and bare-metal. Running on a variation of self hosted k8s / OpenShift / RKE2.
+      U: ENI networking, Overlay, L3/L4 policies, FQDN based policy, FQDN filtering, IPSec, Tetragon, Hubble
+      Q: @ungureanuvladvictor
 
     * N: Palark GmbH
       D: Palark uses Cilium for networking in its Kubernetes platform provided to numerous customers as a part of its DevOps as a Service offering.
