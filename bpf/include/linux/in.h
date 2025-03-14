@@ -65,6 +65,8 @@ enum {
   IPPROTO_PIM = 103,		/* Protocol Independent Multicast	*/
 #define IPPROTO_PIM		IPPROTO_PIM
   IPPROTO_COMP = 108,		/* Compression Header Protocol		*/
+#define IPPROTO_VRRP IPPROTO_VRRP
+  IPPROTO_VRRP = 112,   /* Virtual Router Redundancy Protocol */
 #define IPPROTO_COMP		IPPROTO_COMP
   IPPROTO_SCTP = 132,		/* Stream Control Transport Protocol	*/
 #define IPPROTO_SCTP		IPPROTO_SCTP

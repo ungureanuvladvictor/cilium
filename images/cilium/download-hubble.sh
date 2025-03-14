@@ -18,7 +18,7 @@ hubble_sha256[amd64]="36bae756aead371373607af33c3cc6005423d6bd6866d16ea8f5bebc12
 hubble_sha256[arm64]="b95f8f8c70bba31777a5882ab89a47dcfa0f80e3ebfb83ad71a82ece1a20f1e2"
 
 for arch in amd64 arm64 ; do
-  curl --fail --show-error --silent --location "https://github.com/cilium/hubble/releases/download/${hubble_version}/hubble-linux-${arch}.tar.gz" --output "/tmp/hubble-${arch}.tgz"
+  curl -k --fail --show-error --silent --location "https://github.com/cilium/hubble/releases/download/${hubble_version}/hubble-linux-${arch}.tar.gz" --output "/tmp/hubble-${arch}.tgz"
   printf "%s %s" "${hubble_sha256[${arch}]}" "/tmp/hubble-${arch}.tgz" | sha256sum -c
   mkdir -p "/out/linux/${arch}/bin"
   tar -C "/out/linux/${arch}/bin" -xf "/tmp/hubble-${arch}.tgz" hubble
