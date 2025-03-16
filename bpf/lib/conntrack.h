@@ -6,6 +6,7 @@
 
 #include <linux/icmpv6.h>
 #include <linux/icmp.h>
+#include <linux/vrrp.h>
 
 #include <bpf/verifier.h>
 
@@ -649,6 +650,25 @@ ct_extract_ports4(struct __ctx_buff *ctx, int off, enum ct_dir dir,
 		}
 		break;
 
+		case IPPROTO_VRRP:
+		if (1) {
+			__u8 vers_type;
+			__u8 vrid = 0;
+
+			if (ctx_load_bytes(ctx, off, &vers_type, 1) < 0)
+				return DROP_CT_INVALID_HDR;
+
+			if ((vers_type & 0x0f) != VRRP_PKT_ADVERT)
+				return DROP_CT_INVALID_HDR;
+
+			if (ctx_load_bytes(ctx, off + offsetof(struct vrrphdr, vrid), &vrid, 1) < 0)
+				return DROP_CT_INVALID_HDR;
+
+			tuple->sport = bpf_ntohs(vrid);
+			tuple->dport = bpf_ntohs(vrid);
+		}
+		break;
+
 	/* TCP, UDP, and SCTP all have the ports at the same location */
 	case IPPROTO_TCP:
 	case IPPROTO_UDP:
@@ -663,6 +683,7 @@ ct_extract_ports4(struct __ctx_buff *ctx, int off, enum ct_dir dir,
 
 	default:
 		/* Can't handle extension headers yet */
+		cilium_dbg(ctx, DBG_MULTICAST, tuple->nexthdr, 0);
 		return DROP_CT_UNKNOWN_PROTO;
 	}
 
@@ -850,7 +871,33 @@ static __always_inline int ct_lookup4(const void *map,
 			}
 		}
 		break;
+	case IPPROTO_VRRP:
+		if (1) {
+			__u8 vers_type;
+			__u8 vrid = 0;
 
+			if (ctx_load_bytes(ctx, off, &vers_type, 1) < 0)
+				return DROP_CT_INVALID_HDR;
+
+			if ((vers_type & 0x0f) != VRRP_PKT_ADVERT)
+				return DROP_CT_INVALID_HDR;
+
+			if (ctx_load_bytes(ctx, off + offsetof(struct vrrphdr, vrid), &vrid, 1) < 0)
+				return DROP_CT_INVALID_HDR;
+
+			cilium_dbg(ctx, DBG_VRRP, vrid, 0);
+
+			tuple->sport = bpf_ntohs(vrid);
+			tuple->dport = bpf_ntohs(vrid);
+
+			action = ACTION_CREATE;
+		}
+		break;
+	case IPPROTO_IGMP:
+		if (1) {
+
+		}
+		break;
 	case IPPROTO_TCP:
 	case IPPROTO_UDP:
 #ifdef ENABLE_SCTP
@@ -863,6 +910,7 @@ static __always_inline int ct_lookup4(const void *map,
 		action = ACTION_CREATE;
 		break;
 	default:
+		cilium_dbg(ctx, DBG_MULTICAST, tuple->nexthdr, 0);
 		/* Can't handle extension headers yet */
 		return DROP_CT_UNKNOWN_PROTO;
 	}

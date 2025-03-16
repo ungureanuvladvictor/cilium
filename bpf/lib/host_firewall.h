@@ -259,9 +259,6 @@ ipv4_host_policy_egress(struct __ctx_buff *ctx, __u32 src_id,
 	if (!revalidate_data(ctx, &data, &data_end, &ip4))
 		return DROP_INVALID;
 
-	if (ip4->protocol == IPPROTO_VRRP)
-		return CTX_ACT_OK;
-
 	/* Lookup connection in conntrack map. */
 	tuple.nexthdr = ip4->protocol;
 	tuple.daddr = ip4->daddr;
@@ -338,9 +335,6 @@ ipv4_host_policy_ingress(struct __ctx_buff *ctx, __u32 *src_id,
 
 	/* Only enforce host policies for packets to host IPs. */
 	if (dst_id != HOST_ID)
-		return CTX_ACT_OK;
-
-	if (ip4->protocol == IPPROTO_VRRP)
 		return CTX_ACT_OK;
 
 	/* Lookup connection in conntrack map. */

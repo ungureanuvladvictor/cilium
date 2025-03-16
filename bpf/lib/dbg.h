@@ -123,6 +123,8 @@ enum {
 				 * arg2: daddr (last 4 bytes for IPv6)
 				 * arg3: proxy port (in host byte order)
 				 */
+	DBG_VRRP,
+	DBG_MULTICAST,
 };
 
 /* Capture types */
