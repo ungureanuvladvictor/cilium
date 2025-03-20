@@ -264,6 +264,10 @@ ipv4_host_policy_egress(struct __ctx_buff *ctx, __u32 src_id,
 	tuple.daddr = ip4->daddr;
 	tuple.saddr = ip4->saddr;
 	l4_off = l3_off + ipv4_hdrlen(ip4);
+
+	if (tuple.nexthdr == IPPROTO_VRRP || tuple.nexthdr == IPPROTO_IGMP)
+		return CTX_ACT_OK;
+
 	ret = ct_lookup4(get_ct_map4(&tuple), &tuple, ctx, l4_off, CT_EGRESS,
 			 &ct_state, &trace->monitor);
 	if (ret < 0)
@@ -342,6 +346,11 @@ ipv4_host_policy_ingress(struct __ctx_buff *ctx, __u32 *src_id,
 	tuple.daddr = ip4->daddr;
 	tuple.saddr = ip4->saddr;
 	l4_off = l3_off + ipv4_hdrlen(ip4);
+
+	if (tuple.nexthdr == IPPROTO_VRRP || tuple.nexthdr == IPPROTO_IGMP)
+		return CTX_ACT_OK;
+
+
 #  ifndef ENABLE_IPV4_FRAGMENTS
 	/* Indicate that this is a datagram fragment for which we cannot
 	 * retrieve L4 ports. Do not set flag if we support fragmentation.
